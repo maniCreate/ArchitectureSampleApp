@@ -2,6 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:APIClient-MVC.xcodeproj">
+      location = "self:APIClient-MVP.xcodeproj">
    </FileRef>
 </Workspace>

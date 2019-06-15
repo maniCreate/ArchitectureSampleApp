@@ -1,6 +1,6 @@
 //
 //  ViewController.swift
-//  APIClient-MVC
+//  APIClient-MVP
 //
 //  Created by Syunsuke Nakao on 2019/06/13.
 //  Copyright © 2019 Syunsuke Nakao. All rights reserved.
@@ -8,14 +8,20 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, EntryListModelDelegate {
+protocol ListView: class {
+    func fetchListData()
+}
 
+class ListViewController: UIViewController {
+    
     @IBOutlet weak var tableView: UITableView!
     
-    private let listModel = EntryListModel()
+    private var presenter: EntryListPresenter!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        presenter = EntryListPresenter(view: self)
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -23,21 +29,38 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         tableView.refreshControl = UIRefreshControl()
         tableView.refreshControl?.addTarget(self, action: #selector(refresh(_:)), for: .valueChanged)
         
-        listModel.delegate = self
-        
-        listModel.fetchData()
-        
+        presenter.fetchList()
     }
     
+    @objc func refresh(_ sender: UIRefreshControl) {
+        presenter.fetchList()
+        sender.endRefreshing()
+    }
+    
+
+}
+
+extension ListViewController: ListView {
+    
+    func fetchListData() {
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
+    
+}
+
+extension ListViewController: UITableViewDelegate,UITableViewDataSource {
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return listModel.dataCount()
+        return presenter.numberOfEntries
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         
-        let content = listModel.entryListData[indexPath.row]
+        let content = presenter.entriesList[indexPath.row]
         
         let imageView = cell.contentView.viewWithTag(1) as! UIImageView
         imageView.setImage(fromUrl: content.authorImageUrl)
@@ -51,18 +74,6 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 100
     }
-    
-    func didFinishReloadData() {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
-    }
-    
-    @objc func refresh(_ sender: UIRefreshControl) {
-        listModel.fetchData()
-        sender.endRefreshing()
-    }
-    
     
 }
 

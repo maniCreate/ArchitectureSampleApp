@@ -1,6 +1,6 @@
 //
-//  QiitaApiClient.swift
-//  APIClient-MVC
+//  EntryListModel.swift
+//  APIClient-MVP
 //
 //  Created by Syunsuke Nakao on 2019/06/13.
 //  Copyright © 2019 Syunsuke Nakao. All rights reserved.
@@ -9,7 +9,7 @@
 import Foundation
 
 protocol EntryListModelDelegate: class {
-    func didFinishReloadData()
+    func didFinishFetchData()
 }
 
 class EntryListModel {
@@ -18,7 +18,7 @@ class EntryListModel {
     
     var entryListData: [Entry] = [] {
         didSet {
-            delegate?.didFinishReloadData()
+            delegate?.didFinishFetchData()
         }
     }
     
@@ -35,7 +35,7 @@ class EntryListModel {
                 let json = try JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! [Any]
                 
                 self.entryListData = json.map { (article) -> Entry in
-
+                    
                     let entryData:[String:Any] = article as! [String: Any]
                     
                     let title = entryData["title"] as? String
@@ -51,7 +51,7 @@ class EntryListModel {
                         likesCount: likesCount,
                         pageView: pageView
                     )
-
+                    
                     return entry
                 }
                 

@@ -1,13 +1,12 @@
 //
 //  Entry.swift
-//  APIClient-MVC
+//  APIClient-MVP
 //
 //  Created by Syunsuke Nakao on 2019/06/13.
 //  Copyright © 2019 Syunsuke Nakao. All rights reserved.
 //
 
 import Foundation
-
 
 struct Entry {
     
